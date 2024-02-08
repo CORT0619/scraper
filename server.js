@@ -4,44 +4,28 @@ import fs from 'node:fs';
 import path, { join } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import * as ExcelJS from 'exceljs';
-import express from 'express';
-import { body, validationResult } from 'express-validator';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import 'dotenv/config';
-
-const app = express();
-const router = express.Router();
 
 const client = new DynamoDBClient({ region: 'us-east-2' });
-
-const PORT = process.env.PORT || 3005;
 
 const BASE_URL = 'https://equitypro.com/';
 
 // s3 bucket: scraper-file-uploads
 
-router.post(
-  '/scrape',
-  body('url').notEmpty().isURL().escape(),
-  async (req, res) => {
-    const listingInfo = {};
+export const handler = async (event) => {
+  console.log({ event });
+};
 
-    const validated = validationResult(req);
-    console.log('validated ', validated.errors);
+const listingInfo = {};
 
-    if (validated.array().length > 0) {
-      res.send('There was an error processing your request.');
-    }
-    const { url } = req.body;
-    console.log({ url });
-    // grab website HTML
-    // await grabHTML(website);
+// const { url } = req.body;
+// console.log({ url });
 
-    // TODO: need to upload details to s3
-    // TODO: zip the files and download them
-    res.send('something');
-  },
-);
+// TODO: grab website HTML
+// TODO: await grabHTML(website);
+
+// TODO: need to upload details to s3
+// TODO: zip the files and download them
 
 const grabHTML = async (website) => {
   const workbook = new ExcelJS.default.Workbook();
@@ -191,9 +175,3 @@ const grabImageUrls = async (html, data) => {
   });
   data['images'] = imagesArr;
 };
-
-// (async (website) => await grabHTML(website))(websiteToParse);
-
-app.listen(PORT, () => {
-  console.log('listening on PORT %d ', PORT);
-});
