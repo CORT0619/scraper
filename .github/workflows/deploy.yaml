@@ -1,0 +1,26 @@
+name: deploy-to-aws
+run-name: ${{ github.actor }}
+on:
+  push:
+    branches:
+      - main
+jobs:
+  lambda-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        id: step1
+        uses: actions/checkout@v4
+      - name: Node setup
+        id: step2
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Deploy to AWS
+        id: step3
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::816698261168:role/github_actions
+          aws-region: us-east-2
+      - run: zip -j lambda.zip ./lambda/index.js
+      - run: aws lambda update-function-code --function-name=scraper --zip-file=fileb://lambda.zip
