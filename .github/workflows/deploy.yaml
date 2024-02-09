@@ -7,9 +7,9 @@ on:
 jobs:
   lambda-deployment:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
+    # permissions:
+    #   id-token: write
+    #   contents: read
     steps:
       - name: Checkout repo
         id: step1
@@ -23,7 +23,10 @@ jobs:
         id: step3
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          # audience: sts.amazon.com
           role-to-assume: arn:aws:iam::816698261168:role/github_actions
           aws-region: us-east-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - run: zip -j lambda.zip ./lambda/index.js
       - run: aws lambda update-function-code --function-name=scraper --zip-file=fileb://lambda.zip
