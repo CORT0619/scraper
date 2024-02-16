@@ -30,5 +30,5 @@ jobs:
       - run: cd lambda/ && zip -r layer.zip node_modules
       - run: cd lambda/ && aws lambda publish-layer-version --layer-name deps --zip-file fileb://layer.zip --compatible-runtimes nodejs20.x --region us-east-2
       - run: LAMBDA_LAYER=echo $(aws lambda list-layers --output=text)
-      - run: echo $LAMBDA_LAYER
+      - run: ::set-output name=LAMBDA_LAYER::$(echo $LAMBDA_LAYER)
       # - run: update-function-configuration --function-name=scraper --layers ______
