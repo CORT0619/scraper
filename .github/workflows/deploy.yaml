@@ -7,9 +7,6 @@ on:
 jobs:
   lambda-deployment:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read
     steps:
       - name: Checkout repo
         id: step1
@@ -23,7 +20,6 @@ jobs:
         id: step3
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # audience: sts.amazon.com
           role-to-assume: arn:aws:iam::816698261168:role/github_actions
           aws-region: us-east-2
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -31,6 +27,8 @@ jobs:
       - run: zip -r lambda.zip lambda
       - run: aws lambda update-function-code --function-name=scraper --zip-file=fileb://lambda.zip
       - run: cd lambda/ && npm install
-      - run: ls
       - run: cd lambda/ && zip -r layer.zip node_modules
       - run: cd lambda/ && aws lambda publish-layer-version --layer-name deps --zip-file fileb://layer.zip --compatible-runtimes nodejs20.x --region us-east-2
+      - run: LAMBDA_LAYER=echo $(aws lambda list layers --output=text)
+      - run: echo $LAMBDA_LAYER
+      # - run: update-function-configuration --function-name=scraper --layers ______
