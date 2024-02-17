@@ -32,6 +32,6 @@ jobs:
       - run: echo "LAMBDA_LAYER=$(aws lambda list-layer-versions --layer-name deps --output=text" >> $GITHUB_OUTPUT
       # - run: echo "::set-output name=lambda_layer::$(aws lambda list-layers --output=text)"
       # - run: echo "LAMBDA_LAYER=$(aws lambda list-layer-versions --layer-name deps --output=text --query 'LayerVersions[0].LayerVersionArn')" >> $GITHUB_OUTPUT
-      # - run: echo "LAMBDA_LAYER=$(aws lambda list-layer-versions --layer-name deps --query 'max_by(LayerVersions, &Version).LayerVersionArn' --output text" >> $GITHUB_OUTPUT
+      - run: echo "LAMBDA_LAYER=$(aws lambda list-layer-versions --layer-name deps --query 'max_by(LayerVersions, &Version).LayerVersionArn' --output=text" >> $GITHUB_OUTPUT
       - run: echo "${{ steps.step3.outputs.LAMBDA_LAYER }}"
       - run: aws lambda update-function-configuration --function-name=scraper --layers ${{ steps.step3.outputs.LAMBDA_LAYER }}
