@@ -37,6 +37,7 @@ jobs:
         run: echo "LAMBDA_LAYER=blue" >> "$GITHUB_OUTPUT"
       # - run: echo "LAMBDA_LAYER=$(aws lambda list-layer-versions --layer-name deps --query 'max_by(LayerVersions, &Version).LayerVersionArn' --output text)" >> "$GITHUB_OUTPUT"
       - name: get layer
-        run: echo "lambda layer is $LAMBDA_LAYER" \
-          echo "something ${{ steps.set-layer-var.outputs.LAMBDA_LAYER }}"
+        env:
+          LAMBDA_LAYER: ${{ steps.set-layer-var.outputs.LAMBDA_LAYER }}
+        run: echo "lambda layer is $LAMBDA_LAYER"
       # - run: aws lambda update-function-configuration --function-name=scraper --layers $LAMBDA_LAYER
