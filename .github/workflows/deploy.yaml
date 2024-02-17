@@ -29,6 +29,8 @@ jobs:
       - run: cd lambda/ && npm install
       - run: cd lambda/ && zip -r layer.zip node_modules
       - run: cd lambda/ && aws lambda publish-layer-version --layer-name deps --zip-file fileb://layer.zip --compatible-runtimes nodejs20.x --region us-east-2
-      - run: echo "::set-output name=lambda_layer::$(aws lambda list-layers --output=text)"
-      - run: ${{ steps.step3.outputs.lambda_layers}}
+      # - run: echo "::set-output name=lambda_layer::$(aws lambda list-layers --output=text)"
+      - run: echo "LAMBDA_LAYER=$(aws lambda list-layers --output=json)" >> $GITHUB_OUTPUT
+      - run: ${{ steps.step3.outputs.LAMBDA_LAYER }}
+
       # - run: update-function-configuration --function-name=scraper --layers ______
