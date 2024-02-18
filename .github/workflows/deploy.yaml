@@ -24,7 +24,7 @@ jobs:
           aws-region: us-east-2
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: zip -r lambda.zip lambda
+      - run: cd lambda/ && zip -r lambda.zip lambda
       - run: aws lambda update-function-code --function-name=scraper --zip-file=fileb://lambda.zip
       - run: cd lambda/ && npm install
       - run: cd lambda/ && zip -r layer.zip node_modules
