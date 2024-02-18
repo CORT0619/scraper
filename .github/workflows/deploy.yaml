@@ -25,7 +25,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - run: cd lambda/ && zip -r lambda.zip .
-      - run: aws lambda update-function-code --function-name=scraper --zip-file=fileb://lambda.zip
+      - run: cd lambda/ && aws lambda update-function-code --function-name=scraper --zip-file=fileb://lambda.zip
       - run: cd lambda/ && npm install
       - run: cd lambda/ && zip -r layer.zip node_modules
       - run: cd lambda/ && aws lambda publish-layer-version --layer-name deps --zip-file fileb://layer.zip --compatible-runtimes nodejs20.x --region us-east-2
