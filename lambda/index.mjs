@@ -13,7 +13,9 @@ const BASE_URL = 'https://equitypro.com/';
 // s3 bucket: scraper-file-uploads
 
 export const handler = async (event) => {
-  console.log({ event });
+  event = JSON.parse(event);
+  console.log('url ', event.body.url);
+  const { url } = event.body;
 };
 
 const listingInfo = {};
@@ -166,9 +168,11 @@ const grabImageUrls = async (html, data) => {
   const $ = cheerio.load(html);
   const detailsContainer = $('div.main-wrapper div.container');
 
-  const images = $(detailsContainer).find('img.media__image');
+  // const images = $(detailsContainer).find('img.media__image');
+  const images = $(detailsContainer).find('img.media__element');
   $(images).each(async (i, elem) => {
-    const src = $(elem).attr('data-lazy');
+    // const src = $(elem).attr('data-lazy');
+    const src = $(elem).attr('data-src');
     const imgSrc = `${BASE_URL}${src}`;
     imagesArr.push(imgSrc);
     await downloadImages(imgSrc, data.title);
