@@ -36,3 +36,11 @@ jobs:
         env:
           LAMBDA_LAYER: ${{ steps.set-layer-var.outputs.LAMBDA_LAYER }}
         run: aws lambda update-function-configuration --function-name=scraper --layers "$LAMBDA_LAYER"
+      # - name: create dynamodb table
+      #   id: create-dynamo-table
+      #   run: aws dynamodb create-table \
+      #     --table-name ScraperTemplates \
+      #     --attribute-definitions AttributeName=Url,AttributeType=S AttributeName=
+# need to create a dynamodb table for storing urls and templates
+
+# Columns: Url, Property title, image regex, details container, images, interior rehab details 1 & 2,
