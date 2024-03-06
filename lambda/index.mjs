@@ -5,23 +5,48 @@ import path, { join } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import * as ExcelJS from 'exceljs';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const client = new DynamoDBClient({ region: 'us-east-2' });
+const dbClient = new DynamoDBClient({ region: 'us-east-2' });
+const client = new SFNClient();
 
 const BASE_URL = 'https://equitypro.com/';
 
 // s3 bucket: scraper-file-uploads
+const s3Client = new S3Client({}); // s3 client
+
+
+// steps:
+/*
+  - hit api gateway endpoint
+  - hit lambda, - check dynamodb to see if website is in our list
+  - if in list call step function to determine which lambda to go continue processing 
+*/
 
 export const handler = async (event) => {
   event = JSON.parse(event);
-  console.log('url ', event.body.url);
   const { url } = event.body;
+
+  // check database for url
+  // const res = dbClient.
+
+
+  // call step function for processing
+  /*
+  const input = {
+    stateMachineArn: '', // TODO: fill this in
+    input: `{"url": ${url}}`
+  };
+*/
+  // const command = new StartExecutionCommand(input);
+  // const response = await client.send(command);
+
+  await grabHTML(url);
 };
 
 const listingInfo = {};
 
-// const { url } = req.body;
-// console.log({ url });
 
 // TODO: grab website HTML
 // TODO: await grabHTML(website);
@@ -53,16 +78,20 @@ const grabHTML = async (website) => {
   // create worksheet
   const sheet = workbook.addWorksheet(`${title}`);
 
+  /*
   // create folder for property
   try {
     // TODO: this needs to be turned into a "folder" in s3
     const propertyURL = new URL(`./${title}/`, import.meta.url);
     const propertyFolder = await mkdir(propertyURL);
+
   } catch (err) {
     console.error('error creating property folder ', err);
     throw new Error(`error creating property folder ${JSON.stringify(err)}`);
   }
+  */
 
+  /*
   // create images folder
   try {
     // TODO: this needs to be turned into a nested "folder" in s3
@@ -72,6 +101,7 @@ const grabHTML = async (website) => {
     console.error('error creating folder ', err);
     throw new Error(`error creating nested folder ${JSON.stringify(err)}`);
   }
+  */
 
   // grab the property images
   await grabImageUrls(propertyHTML, listingInfo[title]);
@@ -150,12 +180,21 @@ const downloadImages = async (url, title) => {
   try {
     // grab the image stream
     const config = { responseType: 'stream' };
+    // const config = { responseType: '' };
     const response = await axios.get(url, config);
 
     const joined = join(`${title}`, 'images', matched[0]);
 
     response.data
-      .pipe(fs.createWriteStream(joined))
+      .pipe(
+        await s3Client.send(
+          new PutObjectCommand({
+             Bucket: 'scraper-file-uploads',
+             Key: joined,
+             Body: fs.createWriteStream(joined)
+          })
+        )
+      )
       .on('error', (err) => console.error('An error occurred ', err))
       .once('close', () => console.log('closing...'));
   } catch (err) {
